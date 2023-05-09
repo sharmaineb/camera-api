@@ -39,7 +39,7 @@ The following endpoints are available in the API:
 * `POST /purchases`: Creates a new purchase.
 
 ### Authentication
-The API uses JSON Web Tokens (JWT) for authentication. To access protected endpoints, you'll need to include an `Authorization` header with a valid JWT token. To obtain a token, you can use the `/auth/login` endpoint with valid user credentials.
+Some of the API endpoints are protected, which means they can only be accessed by users who are authenticated (i.e. have logged in). To see that you're an authenticated user, you need to include an `Authorization` header in your request. This header should contain a valid JWT token, which you can get by logging in using the `/auth/login` endpoint. Once you have a valid token, you can include it in your requests to protected endpoints to access the corresponding functionality.
 
 ### Testing
 The API includes a suite of tests that can be run using the command `npm test`. The tests use the Mocha testing framework and the Chai assertion library.
