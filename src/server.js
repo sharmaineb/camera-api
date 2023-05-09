@@ -1,28 +1,22 @@
-require('dotenv/config')
-const express = require('express')
-const bodyParser = require('body-parser')
+require('dotenv').config();
+const express = require('express');
+const cookieParser = require('cookie-parser');
 
-// Set App Variable
-const app = express()
+const app = express();
 
-// Use Body Parser
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+require('./data/db');
 
-app.use((req, res, next) => {
-    const now = new Date().toString()
-    console.log(`Requested ${req.url} at ${now}`)
-    next()
-})
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-// Database Setup
-require('./config/db-setup.js')
+require('./controllers/auth')(app);
+require('./controllers/film')(app);
 
-// Routes
-const router = require('./routes/index.js')
-app.use(router)
+const port = process.env.PORT;
 
-// Start Server
-app.listen(process.env.PORT, () => {
-  console.log(`Example app listening on port ${process.env.PORT}!`)
-})
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+
+module.exports = app;
