@@ -1,155 +1,45 @@
-# Create a Messages API ([lesson plan](https://github.com/Tech-at-DU/ACS-2230-Server-Side-Architectures/blob/master/Lessons/04-Databases/README.md#create-a-messages-api-30-minutes))
+# Camera API
 
-Clone the [starter code](https://github.com/tech-at-du/messages-api-starter) to get started with this activity. Open the directory in your terminal and run `npm install`. The starter code already includes code to set up the Mongoose connection; all we need to do is add the models and modify the routes.
+This is a simple API for managing a camera film store. It allows users to browse available films, purchase them, and manage their own purchases. The API was built using Node.js and MongoDB.
 
-To start off, visit your endpoints in Postman to see how you can interact with them. There are CRUD endpoints for the `User` resource and the `Message` resource - however, those resources haven't actually been written yet!
+### Getting Started
 
-### User Model
+To get started with the project, you'll need to have Node.js and MongoDB installed on your system.
 
-Add the following code to `src/models/user.js`. For now, we'll be storing our passwords in plaintext, which is not very secure! We'll fix that in a future lesson.
+1. Clone the repository to your local machine.
+* ```git clone https://github.com/example/camera-api.git```
 
-```js
-const UserSchema = new Schema({
-  username: { type: String, required: true },
-  password: { type: String, select: false }
-})
+2. Install the required dependencies by running npm install.
+* ```npm install```
 
-const User = mongoose.model('User', UserSchema)
+3. Create a .env file at the root of the project, with the following variables:
+* ```cp .env.example .env```
 
-module.exports = User
+```bash
+PORT=3000
+MONGODB_URI=mongodb://localhost/camera-api
+JWT_SECRET=your_secret_key_here
 ```
 
-Then modify the routes in `src/routes/user.js` as follows:
+4. Run the application using the command `nodemon`.
+5. You should now be able to access the API at `http://localhost:3000`.
 
-```js
-const User = require('../models/user')
+### Endpoints
 
-router.get('/', (req, res) => {
-    User.find().then((users) => {
-        return res.json({users})
-    })
-    .catch((err) => {
-        throw err.message
-    });
-})
+The following endpoints are available in the API:
 
-router.get('/:userId', (req, res) => {
-    console.log(`User id: ${req.params.userId}`)
-    User.findById(req.params.userId).then((user) => {
-        return res.json({user})
-    })
-    .catch((err) => {
-        throw err.message
-    });
-})
+* `GET /films`: Returns a list of all available films.
+* `POST /film`s`: Creates a new film.
+* `GET /films/:id`: Returns a single film.
+* `PUT /films/:id`: Updates a film.
+* `DELETE /films/:id`: Deletes a film.
+* `POST /auth/signup`: Creates a new user account.
+* `POST /auth/login`: Logs in a user and returns an access token.
+* `GET /purchases`: Returns a list of all purchases made by the authenticated user.
+* `POST /purchases`: Creates a new purchase.
 
-router.post('/', (req, res) => {
-    let user = new User(req.body)
-    user.save().then(userResult => {
-        return res.json({user: userResult})
-    }).catch((err) => {
-        throw err.message
-    })
-})
+### Authentication
+The API uses JSON Web Tokens (JWT) for authentication. To access protected endpoints, you'll need to include an `Authorization` header with a valid JWT token. To obtain a token, you can use the `/auth/login` endpoint with valid user credentials.
 
-router.put('/:userId', (req, res) => {
-    User.findByIdAndUpdate(req.params.userId, req.body).then((user) => {
-        return res.json({user})
-    }).catch((err) => {
-        throw err.message
-    })
-})
-
-router.delete('/:userId', (req, res) => {
-    User.findByIdAndDelete(req.params.userId).then(() => {
-        return res.json({
-            'message': 'Successfully deleted.',
-            '_id': req.params.userId
-        })
-    })
-    .catch((err) => {
-        throw err.message
-    })
-})
-```
-
-### Activity: Message Model
-
-Using the existing code as a reference, write the `Message` model and modify the routes to execute the CRUD operations on `Message` objects. A `Message` should have the required fields of `title`, `body`, and `author`.
-
-### Connecting our Models
-
-We want to specify that there is a one-to-many relationship between `Message` and `User` (that is, a user can have many messages, but a message can have only one author).
-
-In `models/message.js`, add the following to the model definition:
-
-```js
-const MessageSchema = new Schema({
-  // ...
-  author : { type: Schema.Types.ObjectId, ref: "User", required: true },
-})
-```
-
-Then in `models/user.js`, add the following:
-
-```js
-const UserSchema = new Schema({
-  messages : [{ type: Schema.Types.ObjectId, ref: "Message" }]
-})
-```
-
-Then, in `routes/message.js`, let's make sure that the `User` model is updated whenever we add a new message:
-
-```js
-/** Route to add a new message. */
-router.post('/', (req, res) => {
-    let message = new Message(req.body)
-    message.save()
-    .then(message => {
-        return User.findById(message.author)
-    })
-    .then(user => {
-        console.log(user)
-        user.messages.unshift(message)
-        return user.save()
-    })
-    .then(_ => {
-        return res.send(message)
-    }).catch(err => {
-        throw err.message
-    })
-})
-```
-
-Let's try it out in Postman!
-
-Finally, let's make sure that whenever we make a query for users, we see that user's messages as well. 
-
-Replace the existing code in `models/user.js` with the code below. 
-
-
-```js
-const UserSchema = new Schema({
-  username: { type: String, required: true },
-  password: { type: String, select: false }
-})
-
-UserSchema.pre('findOne', function (next) {
-    this.populate('messages')
-    next()
-})
-
-UserSchema.pre('find', function (next) {
-    this.populate('messages')
-    next()
-})
-
-const User = mongoose.model('User', UserSchema)
-
-module.exports = User
-```
-
-
-
-
-# camera-api
+### Testing
+The API includes a suite of tests that can be run using the command `npm test`. The tests use the Mocha testing framework and the Chai assertion library.
