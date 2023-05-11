@@ -7,7 +7,7 @@ This is a simple API for managing a camera film store. It allows users to browse
 To get started with the project, you'll need to have Node.js and MongoDB installed on your system.
 
 1. Clone the repository to your local machine.
-* ```git clone https://github.com/example/camera-api.git```
+* ```git clone https://github.com/sharmaineb/camera-api.git```
 
 2. Install the required dependencies by running npm install.
 * ```npm install```
