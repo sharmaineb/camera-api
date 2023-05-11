@@ -13,7 +13,7 @@ To get started with the project, you'll need to have Node.js and MongoDB install
 * ```npm install```
 
 3. Create a .env file at the root of the project, with the following variables:
-* ```cp .env.example .env```
+* ```cp .env ```
 
 ```bash
 PORT=3000
